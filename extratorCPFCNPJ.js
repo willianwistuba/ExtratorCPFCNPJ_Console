@@ -6,20 +6,20 @@ function extractCPFCNPJAndGenerateLinks() {
   const cpfCnpjRegex = /\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}/g;
 
   // Extrai os números de CPF e CNPJ
-  const cpfCnpjList = [];
+  const cpfCnpjSet = new Set();
   const pageHtml = document.documentElement.outerHTML;
   let match = cpfCnpjRegex.exec(pageHtml);
   while (match) {
     // Remove a formatação dos números de CPF e CNPJ
     const unformattedCpfCnpj = match[0].replace(/\D/g, '');
 
-    // Adiciona os números de CPF e CNPJ desformatados à lista
-    cpfCnpjList.push(unformattedCpfCnpj);
+    // Adiciona os números de CPF e CNPJ desformatados ao conjunto para eliminar duplicatas
+    cpfCnpjSet.add(unformattedCpfCnpj);
     match = cpfCnpjRegex.exec(pageHtml);
   }
 
-  // Gera links para os números de CNPJ desformatados
-  const links = cpfCnpjList.map((cnpj) => {
+  // Gera links para os números de CNPJ desformatados a partir do conjunto
+  const links = Array.from(cpfCnpjSet).map((cnpj) => {
     const receitaWSLink = `https://receitaws.com.br/v1/cnpj/${cnpj}`;
     const minhaReceitaLink = `https://minhareceita.org/${cnpj}`;
     return `<a href="${receitaWSLink}" target="_blank">${receitaWSLink}</a><br><a href="${minhaReceitaLink}" target="_blank">${minhaReceitaLink}</a><br>`;
