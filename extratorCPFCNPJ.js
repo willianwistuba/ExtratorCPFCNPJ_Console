@@ -2,6 +2,13 @@
 // 2 - Copie a função abaixo no Console do Navegador e Aperte ENTER
 
 function extractCPFCNPJAndGenerateLinks() {
+  // Bases de consulta de CNPJ ({CNPJ} é substituído pelo número sem formatação)
+  const basesCnpj = [
+    'https://receitaws.com.br/v1/cnpj/{CNPJ}',
+    'https://minhareceita.org/{CNPJ}',
+    'https://publica.cnpj.ws/cnpj/{CNPJ}'
+  ];
+
   // Regex para encontrar números de CPF e CNPJ na página
   const cpfCnpjRegex = /\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}/g;
 
@@ -19,15 +26,18 @@ function extractCPFCNPJAndGenerateLinks() {
     } else if (unformattedCpfCnpj.length === 14) { // É um CNPJ
       cnpjArray.push(unformattedCpfCnpj);
     }
-    
+
     match = cpfCnpjRegex.exec(pageHtml);
   }
 
-  // Gera links apenas para os números de CNPJ
+  // Gera links apenas para os números de CNPJ (um link por base)
   const cnpjLinks = cnpjArray.map((cnpj) => {
-    const receitaWSLink = `https://receitaws.com.br/v1/cnpj/${cnpj}`;
-    const minhaReceitaLink = `https://minhareceita.org/${cnpj}`;
-    return `<a href="${receitaWSLink}" target="_blank">${receitaWSLink}</a><br><a href="${minhaReceitaLink}" target="_blank">${minhaReceitaLink}</a><br>`;
+    return basesCnpj
+      .map((base) => {
+        const link = base.replace('{CNPJ}', cnpj);
+        return `<a href="${link}" target="_blank">${link}</a><br>`;
+      })
+      .join('');
   });
 
   // Abre uma nova janela com os links para CNPJ e exibe os números de CPF
